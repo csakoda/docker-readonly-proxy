@@ -1,0 +1,7 @@
+docker-readonly-proxy:
+  image: csakoda/docker-readonly-proxy
+  build: .
+  ports:
+    - 80:80
+  volumes:
+    - /var/run/docker.sock:/tmp/docker.sock:ro
