@@ -1,0 +1,55 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "volumes": [
+        {
+            "name": "dockersocket",
+            "host": {
+                "sourcePath": "/var/run/docker.sock"
+            }
+        }
+    ],
+    "containerDefinitions": [
+        {
+            "name": "docker-readonly-proxy",
+            "image": "csakoda/docker-readonly-proxy",
+            "essential": true,
+            "memory": 128,
+            "portMappings": [
+                {
+                    "hostPort": 10189,
+                    "containerPort": 80
+                }
+            ],
+            "mountPoints": [
+                {
+                    "sourceVolume": "dockersocket",
+                    "containerPath": "/tmp/docker.sock",
+                    "readOnly": true
+                }
+            ]
+        },
+        {
+            "name": "docker-readonly-proxy-monitor",
+            "image": "csakoda/docker-readonly-proxy-monitor",
+            "essential": true,
+            "memory": 64,
+            "links": [
+                "docker-readonly-proxy"
+            ],
+            "environment": [
+                {
+                    "name": "STATUS_ENDPOINT",
+                    "value": "http://docker-readonly-proxy/nginx_status"
+                },
+                {
+                    "name": "SLEEP_DURATION",
+                    "value": "60"
+                },
+                {
+                    "name": "MAX_IDLE_COUNT",
+                    "value": "5"
+                }
+            ]
+        }
+    ]
+}
