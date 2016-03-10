@@ -1,7 +1,14 @@
 docker-readonly-proxy:
-  image: csakoda/docker-readonly-proxy
   build: .
   ports:
     - 80:80
   volumes:
     - /var/run/docker.sock:/tmp/docker.sock:ro
+docker-readonly-proxy-monitor:
+  build: monitor/
+  links:
+    - docker-readonly-proxy
+  environment:
+    STATUS_ENDPOINT: http://docker-readonly-proxy/nginx_status
+    SLEEP_DURATION: 5
+    MAX_IDLE_COUNT: 3
